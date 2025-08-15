@@ -1,7 +1,9 @@
 import { FastMCP } from "fastmcp";
 
-import { fastmail } from "./fastmail/service.js";
-import { registerFastMailTools } from "./fastmail/tools.js";
+import { registerAirtable } from "./airtable-mcp.js";
+import { airtable } from "./airtable-service.js";
+import { registerFastMail } from "./fastmail-mcp.js";
+import { fastmail } from "./fastmail-service.js";
 import { getVersion } from "./helpers.js";
 import { logger } from "./logger.js";
 
@@ -10,7 +12,8 @@ const server = new FastMCP({
   version: getVersion(),
 });
 
-registerFastMailTools(server);
+registerAirtable(server);
+registerFastMail(server);
 
 server.start({
   transportType: "stdio",
@@ -18,4 +21,5 @@ server.start({
 
 server.on("connect", async () => {
   await fastmail.init().catch(logger.error);
+  await airtable.init().catch(logger.error);
 });
