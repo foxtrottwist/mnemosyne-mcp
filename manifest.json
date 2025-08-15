@@ -1,0 +1,54 @@
+{
+  "dxt_version": "0.1",
+  "name": "shortcuts-mcp",
+  "display_name": "Shortcuts",
+  "version": "1.0.0",
+  "description": "MCP server connecting FastMail, Airtable, and AI services for intelligent productivity automation.",
+  "long_description": "Connect Claude to your core productivity tools with AI-enhanced automation:\n\n- **Email intelligence** - JMAP-powered FastMail integration with smart filtering and response suggestions\n- **Business data sync** - Airtable contact management and project tracking with cross-service updates\n- **Privacy-first AI** - Local and cloud AI routing based on content sensitivity\n- **Knowledge extraction** - Automatic entity recognition and relationship mapping across services",
+  "author": {
+    "name": "Law Horne",
+    "email": "hello@foxtrottwist.com",
+    "url": "https://www.lawrencehorne.com/"
+  },
+  "homepage": "https://www.lawrencehorne.com/mcp",
+  "documentation": "https://github.com/foxtrottwist/shortcuts-mcp?tab=readme-ov-file#mnemosyne-mcp",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/server.js"],
+      "env": {}
+    }
+  },
+  "tools": [],
+  "prompts": [],
+  "keywords": [
+    "mcp",
+    "productivity",
+    "fastmail",
+    "airtable",
+    "ai",
+    "typescript",
+    "claude",
+    "automation",
+    "workflow",
+    "intelligence",
+    "jmap",
+    "email",
+    "business-data",
+    "knowledge-graph",
+    "integration"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/foxtrottwist/mnemosyne-mcp"
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "runtimes": {
+      "node": ">=22.0.0"
+    }
+  }
+}
