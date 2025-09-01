@@ -2,9 +2,31 @@ import { FastMCP } from "fastmcp";
 import { z } from "zod";
 
 import { airtable } from "./airtable-service.js";
-import { manageSchemaParameters } from "./airtable-types.js";
+import {
+  listRecordsParameters,
+  manageSchemaParameters,
+  recordParameters,
+} from "./airtable-types.js";
 
 export function registerAirtable(server: FastMCP) {
+  server.addTool({
+    description: "Get record by id",
+    execute: async (args) => {
+      return JSON.stringify(await airtable.getRecord(args));
+    },
+    name: "get_record",
+    parameters: recordParameters,
+  });
+
+  server.addTool({
+    description: "List available records in tables",
+    execute: async (args) => {
+      return JSON.stringify(await airtable.listRecords(args));
+    },
+    name: "list_records",
+    parameters: listRecordsParameters,
+  });
+
   server.addTool({
     description: "List available Airtable tables in the configured base",
     execute: async () => {

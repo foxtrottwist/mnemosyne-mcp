@@ -1,6 +1,10 @@
 import Airtable from "airtable";
 
-import { ManageSchemaArgs } from "./airtable-types.js";
+import {
+  BaseRecordArgs,
+  ListRecordsArgs,
+  ManageSchemaArgs,
+} from "./airtable-types.js";
 
 const tables = process.env.AIRTABLE_TABLES?.split(",") || [];
 const apiKey = process.env.AIRTABLE_API_KEY!;
@@ -12,9 +16,13 @@ async function createRecord() {
   await validateRecord();
 }
 
-async function deleteRecord() {}
+async function deleteRecord({ id, tableName }: BaseRecordArgs) {
+  return await base?.table(tableName).destroy(id);
+}
 
-async function getRecord() {}
+async function getRecord({ id, tableName }: BaseRecordArgs) {
+  return await base?.table(tableName).find(id);
+}
 
 async function init() {
   if (base) {
@@ -29,7 +37,10 @@ async function init() {
   base = Airtable.base(id);
 }
 
-async function listRecords() {}
+async function listRecords(args: ListRecordsArgs) {
+  const { tableName, ...options } = args;
+  return await base?.table(tableName).select(options).all();
+}
 
 function listTables() {
   return tables;

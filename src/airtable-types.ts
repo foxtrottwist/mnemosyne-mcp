@@ -51,5 +51,17 @@ export const manageSchemaParameters = z.object({
   tableName: z.string(),
 });
 
+export const listRecordsParameters = z.object({
+  maxRecords: z.number().optional(),
+  tableName: z.string(),
+});
+
+export const recordParameters = z.object({
+  id: z.string(),
+  tableName: z.string(),
+});
+
 export type AirtableSchema = z.infer<typeof tableSchemaZod>;
+export type BaseRecordArgs = z.infer<typeof recordParameters>;
+export type ListRecordsArgs = z.infer<typeof listRecordsParameters>;
 export type ManageSchemaArgs = z.infer<typeof manageSchemaParameters>;
