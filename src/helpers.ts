@@ -1,6 +1,25 @@
 import { readFileSync } from "fs";
+import { mkdir, readFile, stat, writeFile } from "fs/promises";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+
+import { AirtableSchema } from "./airtable-types.js";
+import { logger } from "./logger.js";
+
+const DATA_DIRECTORY = `${process.env.HOME}/.mnemosyne-mcp/`;
+const SCHEMAS = `${DATA_DIRECTORY}schemas/`;
+
+export async function ensureDataDirectory() {
+  try {
+    await mkdir(DATA_DIRECTORY, { recursive: true });
+    await mkdir(SCHEMAS, { recursive: true });
+
+    logger.info("Data directory initialized");
+  } catch (error) {
+    logger.error({ error: String(error) }, "Failed to create data directory");
+    throw error;
+  }
+}
 
 export function getVersion() {
   try {
@@ -11,6 +30,36 @@ export function getVersion() {
   } catch {
     return "unknown";
   }
+}
+/**
+ * Checks if a path is a file.
+ *
+ * @param path - The path to check
+ * @returns True if path is a file, false otherwise
+ */
+export async function isFile(path: string) {
+  return stat(path)
+    .then((res) => res.isFile())
+    .catch(() => false);
+}
+
+export async function load<T = unknown>(filePath: string, defaultValue: T) {
+  if (await isFile(filePath)) {
+    const file = await readFile(filePath, "utf8");
+
+    try {
+      return JSON.parse(file) as T;
+    } catch (error) {
+      logger.error(
+        { error: String(error), path: filePath },
+        "JSON file corrupted",
+      );
+      throw new Error(`File at ${filePath} corrupted - please reset`);
+    }
+  }
+
+  await ensureDataDirectory();
+  return defaultValue;
 }
 /**
  * Safely attempts to parse a JSON string with error handling.
@@ -33,5 +82,13 @@ export function tryJSONParse(s: string, handleError: (e: unknown) => void) {
     return JSON.parse(s) ?? undefined;
   } catch (e) {
     handleError(e);
+  }
+}
+
+export async function writeSchema(name: string, data: AirtableSchema) {
+  try {
+    await writeFile(`${SCHEMAS}${name}.json`, JSON.stringify(data));
+  } catch (error) {
+    throw new Error(`Failed to save schema ${name}: ${String(error)}`);
   }
 }
