@@ -40,7 +40,7 @@ export function registerAirtable(server: FastMCP) {
     description:
       "Manage Airtable table schemas - discover, add, update, or retrieve cached schema information",
     execute: async (args) => {
-      return JSON.stringify(await airtable.manageSchema(args));
+      return await airtable.manageSchema(args);
     },
     name: "manage_schema",
     parameters: manageSchemaParameters,

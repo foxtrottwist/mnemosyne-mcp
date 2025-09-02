@@ -1,18 +1,17 @@
 import { readFileSync } from "fs";
-import { mkdir, readFile, stat, writeFile } from "fs/promises";
+import { mkdir, readFile, stat } from "fs/promises";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
-import { AirtableSchema } from "./airtable-types.js";
 import { logger } from "./logger.js";
 
 const DATA_DIRECTORY = `${process.env.HOME}/.mnemosyne-mcp/`;
-const SCHEMAS = `${DATA_DIRECTORY}schemas/`;
+export const SCHEMAS_DIRECTORY = `${DATA_DIRECTORY}schemas/`;
 
 export async function ensureDataDirectory() {
   try {
     await mkdir(DATA_DIRECTORY, { recursive: true });
-    await mkdir(SCHEMAS, { recursive: true });
+    await mkdir(SCHEMAS_DIRECTORY, { recursive: true });
 
     logger.info("Data directory initialized");
   } catch (error) {
@@ -31,6 +30,7 @@ export function getVersion() {
     return "unknown";
   }
 }
+
 /**
  * Checks if a path is a file.
  *
@@ -61,6 +61,10 @@ export async function load<T = unknown>(filePath: string, defaultValue: T) {
   await ensureDataDirectory();
   return defaultValue;
 }
+
+export function sanitizeFilename(name: string) {
+  return name.trim().replace(/[^a-zA-Z0-9_-]/g, "_");
+}
 /**
  * Safely attempts to parse a JSON string with error handling.
  *
@@ -82,13 +86,5 @@ export function tryJSONParse(s: string, handleError: (e: unknown) => void) {
     return JSON.parse(s) ?? undefined;
   } catch (e) {
     handleError(e);
-  }
-}
-
-export async function writeSchema(name: string, data: AirtableSchema) {
-  try {
-    await writeFile(`${SCHEMAS}${name}.json`, JSON.stringify(data));
-  } catch (error) {
-    throw new Error(`Failed to save schema ${name}: ${String(error)}`);
   }
 }

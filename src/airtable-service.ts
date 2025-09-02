@@ -1,10 +1,12 @@
 import Airtable from "airtable";
+import { writeFile } from "fs/promises";
 
 import {
   BaseRecordArgs,
   ListRecordsArgs,
   ManageSchemaArgs,
 } from "./airtable-types.js";
+import { load, sanitizeFilename, SCHEMAS_DIRECTORY } from "./helpers.js";
 
 const tables = process.env.AIRTABLE_TABLES?.split(",") || [];
 const apiKey = process.env.AIRTABLE_API_KEY!;
@@ -46,14 +48,25 @@ function listTables() {
   return tables;
 }
 
-async function manageSchema({ action }: ManageSchemaArgs) {
+async function manageSchema({ action, data, tableName }: ManageSchemaArgs) {
+  const filePath = `${SCHEMAS_DIRECTORY}${sanitizeFilename(tableName)}.json`;
+
   switch (action) {
     case "add":
+    case "update": {
+      try {
+        await writeFile(filePath, JSON.stringify(data));
+        return `Succuessful ${action}ed schema ${tableName}`;
+      } catch (error) {
+        throw new Error(`Failed to save schema ${filePath}: ${String(error)}`);
+      }
+    }
     case "discover":
-    case "get":
-    case "update":
+    case "get": {
+      return JSON.stringify(await load(filePath, {}));
+    }
     default:
-      break;
+      throw new Error(`Unsupported action: ${action}`);
   }
 }
 

@@ -45,11 +45,28 @@ const tableSchemaZod = z.object({
   lastUpdated: z.string().datetime(),
 });
 
-export const manageSchemaParameters = z.object({
-  action: z.enum(["add", "discover", "get", "update"]),
-  data: tableSchemaZod.optional(),
-  tableName: z.string(),
-});
+export const manageSchemaParameters = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("add"),
+    data: tableSchemaZod,
+    tableName: z.string(),
+  }),
+  z.object({
+    action: z.literal("update"),
+    data: tableSchemaZod,
+    tableName: z.string(),
+  }),
+  z.object({
+    action: z.literal("get"),
+    data: z.undefined(),
+    tableName: z.string(),
+  }),
+  z.object({
+    action: z.literal("discover"),
+    data: z.undefined(),
+    tableName: z.string(),
+  }),
+]);
 
 export const listRecordsParameters = z.object({
   maxRecords: z.number().optional(),
